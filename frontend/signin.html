@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Medi-AI Login</title>
+<link rel="stylesheet" href="signin.css">
+</head>
+
+<body>
+
+<div class="bg"></div>
+
+<div class="card">
+
+<div class="left">
+  <img src="src/medical_art.jpg" class="art">
+</div>
+
+
+  <div class="right">
+
+    <div class="logo">AI+</div>
+    <h2>MEDI-AI</h2>
+
+    <h1>Welcome. Your health,<br>our priority.</h1>
+
+    <input type="email" id="email" placeholder="Email / Phone Number">
+    <input type="password" id="password" placeholder="Password">
+
+    <div class="row">
+      <a href="#">Forgot password?</a>
+      <a href="signup.html" class="signup">Sign up / Create account</a>
+    </div>
+
+    <button onclick="login()">Login</button>
+
+    <p id="status"></p>
+
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="signin.js"></script>
+
+</body>
+</html>

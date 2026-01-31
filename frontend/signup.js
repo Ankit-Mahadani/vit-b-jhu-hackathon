@@ -1,13 +1,14 @@
-const SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";
-const SUPABASE_ANON_KEY = "YOUR_KEY";
+const SUPABASE_URL = "https://yitjgtkdxfirguuocunt.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlpdGpndGtkeGZpcmd1dW9jdW50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4NTA0NzAsImV4cCI6MjA4NTQyNjQ3MH0.jNm4eTkNDwhWJuewL54HRiggOSwp-29AlFK-qtNS7qw";
 
-const supabase = window.supabase.createClient(
+window.supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 );
 
-async function signup() {
+window.signup = async function signup() {
 
+  const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
   const confirm = document.getElementById("confirm").value;
 
@@ -15,27 +16,36 @@ async function signup() {
     return status("Passwords do not match");
   }
 
-  const { data, error } = await supabase.auth.signUp({
-    email: document.getElementById("email").value,
-    password
-  });
-
+  // Step 1: signup
+  const { error } = await supabaseClient.auth.signUp({ email, password });
   if (error) return status(error.message);
 
-  const user = data.user;
+  // Step 2: login immediately
+  const { data: loginData, error: loginError } =
+    await supabaseClient.auth.signInWithPassword({ email, password });
 
-  // store medical profile
-  await supabase.from("profiles").insert({
-    id: user.id,
-    name: document.getElementById("name").value,
-    dob: document.getElementById("dob").value,
-    blood: document.getElementById("blood").value,
-    allergy: document.getElementById("allergy").value,
-    condition: document.getElementById("condition").value,
-    emergency: document.getElementById("emergency").value
-  });
+  if (loginError) {
+    return status("Check email verification first.");
+  }
 
-  status("Account created! Check email to verify.");
+  const user = loginData.user;
+
+  // Step 3: insert profile
+  const { error: profileError } = await supabaseClient
+    .from("profiles")
+    .insert({
+      id: user.id,
+      name: document.getElementById("name").value,
+      dob: document.getElementById("dob").value,
+      blood: document.getElementById("blood").value,
+      allergy: document.getElementById("allergy").value,
+      condition: document.getElementById("condition").value,
+      emergency: document.getElementById("emergency").value
+    });
+
+  if (profileError) return status(profileError.message);
+
+  status("Account created successfully!");
 }
 
 function status(msg){

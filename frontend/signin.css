@@ -48,16 +48,17 @@ body {
 }
 
 .logo {
-  width: 60px;
-  height: 60px;
-  background: #1fb5a9;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;   /* makes circle */
+  overflow: hidden;     /* hides edges */
   margin-bottom: 10px;
+}
+
+.logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;    /* fills circle nicely */
 }
 
 h2 {

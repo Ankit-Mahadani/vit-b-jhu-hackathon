@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Emergency Symptom Checker</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 :root {
@@ -15,15 +16,24 @@
   --yellow: #fbc02d;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
   font-family: 'Poppins', sans-serif;
   background: linear-gradient(135deg, #f5f7fa, #e4ecf5);
   color: #333;
+}
+
+/* AUTH BAR */
+.authbar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 20px;
+  background:#fff;
+  box-shadow:0 2px 8px rgba(0,0,0,0.05);
+  font-size:14px;
 }
 
 /* HERO */
@@ -35,24 +45,12 @@ body {
   border-radius: 0 0 30px 30px;
 }
 
-.hero h1 {
-  margin: 0;
-  font-size: 28px;
-}
-
-.hero p {
-  opacity: 0.9;
-  font-size: 14px;
-}
-
-/* CONTAINER */
 .container {
   padding: 20px;
   max-width: 500px;
   margin: auto;
 }
 
-/* CARD */
 .card {
   background: rgba(255,255,255,0.9);
   backdrop-filter: blur(10px);
@@ -62,24 +60,14 @@ body {
   box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
 
-.card h2 {
-  margin-top: 0;
-  font-size: 18px;
-  color: var(--red);
-}
-
-/* TEXTAREA */
 textarea {
   width: 100%;
   border-radius: 12px;
   border: 1px solid #ddd;
   padding: 12px;
   font-size: 14px;
-  resize: none;
-  outline: none;
 }
 
-/* BUTTON */
 .btn {
   width: 100%;
   padding: 14px;
@@ -89,32 +77,22 @@ textarea {
   font-weight: 600;
   cursor: pointer;
   margin-top: 15px;
-}
-
-.btn-primary {
   background: var(--blue);
   color: white;
 }
 
-.btn-primary:hover {
-  opacity: 0.9;
-}
-
-/* RESULT */
 .result {
   margin-top: 15px;
   padding: 14px;
   border-radius: 12px;
   font-weight: 600;
   text-align: center;
-  animation: fadeIn 0.4s ease;
 }
 
 .low { background: #e8f5e9; color: var(--green); }
 .medium { background: #fff8e1; color: #9e7700; }
 .high { background: #fdecea; color: var(--red); }
 
-/* HOSPITAL LIST */
 .hospital {
   display: flex;
   justify-content: space-between;
@@ -123,7 +101,6 @@ textarea {
   font-size: 14px;
 }
 
-/* SOS FLOATING */
 .sos {
   position: fixed;
   bottom: 20px;
@@ -133,30 +110,36 @@ textarea {
   border-radius: 50%;
   width: 65px;
   height: 65px;
-  font-size: 14px;
   font-weight: bold;
   border: none;
   box-shadow: 0 10px 30px rgba(229,57,53,0.5);
   cursor: pointer;
 }
 
-/* FOOTER */
 .footer {
   text-align: center;
   font-size: 12px;
   color: #777;
   padding-bottom: 80px;
 }
-
-/* ANIMATION */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
 </style>
 </head>
 
 <body>
+
+<!-- AUTH BAR -->
+<div class="authbar">
+  <span id="userInfo">Checking session...</span>
+  <button onclick="logout()" style="
+    padding:8px 14px;
+    border:none;
+    border-radius:8px;
+    background:#e53935;
+    color:white;
+    cursor:pointer;">
+    Logout
+  </button>
+</div>
 
 <div class="hero">
   <h1>Emergency Symptom Checker</h1>
@@ -167,8 +150,8 @@ textarea {
 
   <div class="card">
     <h2>🩺 Describe Your Symptoms</h2>
-    <textarea id="symptoms" rows="4" placeholder="Example: chest pain, dizziness, breathing problem..."></textarea>
-    <button class="btn btn-primary" onclick="analyze()">Analyze Symptoms</button>
+    <textarea id="symptoms" rows="4"></textarea>
+    <button class="btn" onclick="analyze()">Analyze Symptoms</button>
     <div id="result"></div>
   </div>
 
@@ -177,14 +160,6 @@ textarea {
     <div class="hospital"><span>City Hospital</span><span>2.1 km</span></div>
     <div class="hospital"><span>Apollo Clinic</span><span>3.4 km</span></div>
     <div class="hospital"><span>Emergency Care Center</span><span>4.0 km</span></div>
-  </div>
-
-  <div class="card">
-    <h2>💡 Why This Helps</h2>
-    <p style="font-size:14px;">
-      Quickly identifies symptom severity, reduces delay in emergencies,
-      and helps users reach medical care faster, especially in remote areas.
-    </p>
   </div>
 
   <div class="footer">
@@ -196,36 +171,48 @@ textarea {
 <button class="sos" onclick="sos()">SOS</button>
 
 <script>
+const SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR_KEY";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+async function checkAuth() {
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) {
+    window.location.href = "signin.html";
+    return;
+  }
+
+  document.getElementById("userInfo").innerText =
+    "Logged in as: " + session.user.email;
+}
+
+async function logout() {
+  await supabase.auth.signOut();
+  window.location.href = "signin.html";
+}
+
+checkAuth();
+
 function analyze() {
   const text = document.getElementById("symptoms").value.toLowerCase();
   const result = document.getElementById("result");
 
-  if (!text) {
-    result.innerHTML = "";
-    return;
-  }
+  if (!text) return result.innerHTML = "";
 
   let msg = "Low Risk – Self care recommended";
   let cls = "low";
 
-  if (
-    text.includes("chest") ||
-    text.includes("breathing") ||
-    text.includes("unconscious") ||
-    text.includes("bleeding")
-  ) {
+  if (text.includes("chest") || text.includes("breathing") || text.includes("unconscious")) {
     msg = "High Risk – Seek emergency help immediately";
     cls = "high";
-  } else if (
-    text.includes("fever") ||
-    text.includes("vomiting") ||
-    text.includes("headache")
-  ) {
+  } else if (text.includes("fever") || text.includes("vomiting")) {
     msg = "Medium Risk – Monitor closely";
     cls = "medium";
   }
 
-  result.className = `result ${cls}`;
+  result.className = "result " + cls;
   result.innerText = msg;
 }
 
@@ -236,4 +223,3 @@ function sos() {
 
 </body>
 </html>
-        

@@ -12,7 +12,7 @@ body {
 .bg {
   position: fixed;
   inset: 0;
-  background: url("src/background_signup.jpg") no-repeat center/cover;
+  background: url("https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj6h62Us7ytob0J6W865sd58mifvE-EeiVjNGbf_eC4oMn1e31Z8BPbwaagcAt6x7zPvdDmlD5kwGL_LZGcJI4tCNUL31xhmSigKzvvSmFcom8W7MXaJdka2cZ7Vo5S76uphkK2FFR61Ym_2cM2dPe7LZ98kf-2sNF9DgxGWMqOv9Z2_C3ryt2VHHEsj39H/s1280/background_signup.jpg") no-repeat center/cover;
   z-index: -2;
 }
 

@@ -1,226 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Emergency Symptom Checker</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AEM Emergency Dashboard</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-:root {
-  --red: #e53935;
-  --blue: #1e88e5;
-  --green: #43a047;
-  --yellow: #fbc02d;
-}
-
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, #f5f7fa, #e4ecf5);
-  color: #333;
-}
-
-.authbar {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:10px 20px;
-  background:#fff;
-  box-shadow:0 2px 8px rgba(0,0,0,0.05);
-  font-size:14px;
-}
-
-.hero {
-  background: linear-gradient(135deg, #e53935, #ff7043);
-  color: white;
-  padding: 40px 20px;
-  text-align: center;
-  border-radius: 0 0 30px 30px;
-}
-
-.container {
-  padding: 20px;
-  max-width: 500px;
-  margin: auto;
-}
-
-.card {
-  background: rgba(255,255,255,0.9);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-}
-
-textarea {
-  width: 100%;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-  padding: 12px;
-  font-size: 14px;
-}
-
-.btn {
-  width: 100%;
-  padding: 14px;
-  border-radius: 12px;
-  border: none;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 15px;
-  background: var(--blue);
-  color: white;
-}
-
-.result {
-  margin-top: 15px;
-  padding: 14px;
-  border-radius: 12px;
-  font-weight: 600;
-  text-align: center;
-}
-
-.low { background: #e8f5e9; color: var(--green); }
-.medium { background: #fff8e1; color: #9e7700; }
-.high { background: #fdecea; color: var(--red); }
-
-.hospital {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
-  font-size: 14px;
-}
-
-.sos {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: var(--red);
-  color: white;
-  border-radius: 50%;
-  width: 65px;
-  height: 65px;
-  font-weight: bold;
-  border: none;
-  box-shadow: 0 10px 30px rgba(229,57,53,0.5);
-  cursor: pointer;
-}
-
-.footer {
-  text-align: center;
-  font-size: 12px;
-  color: #777;
-  padding-bottom: 80px;
-}
-</style>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
-
-<div class="authbar">
-  <span id="userInfo">Checking session...</span>
-  <button onclick="logout()" style="
-    padding:8px 14px;
-    border:none;
-    border-radius:8px;
-    background:#e53935;
-    color:white;
-    cursor:pointer;">
-    Logout
-  </button>
-</div>
-
-<div class="hero">
-  <h1>Emergency Symptom Checker</h1>
-  <p>Instant AI-based medical guidance when every second matters</p>
-</div>
-
 <div class="container">
 
-  <div class="card">
-    <h2>🩺 Describe Your Symptoms</h2>
-    <textarea id="symptoms" rows="4"></textarea>
-    <button class="btn" onclick="analyze()">Analyze Symptoms</button>
-    <div id="result"></div>
-  </div>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <h2>AEM</h2>
+    </div>
 
-  <div class="card">
-    <h2>🏥 Nearby Hospitals</h2>
-    <div class="hospital"><span>City Hospital</span><span>2.1 km</span></div>
-    <div class="hospital"><span>Apollo Clinic</span><span>3.4 km</span></div>
-    <div class="hospital"><span>Emergency Care Center</span><span>4.0 km</span></div>
-  </div>
+    <div class="active-badge">
+      <i class="fa-solid fa-thumbs-up"></i>
+      <span>Dashboard</span>
+    </div>
 
-  <div class="footer">
-    Team Skill Issue · VIT Bhopal · HealthHack
-  </div>
+    <nav>
+      <ul>
+        <li class="active"><a href="#"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+        <li><a href="#"><i class="fa-solid fa-stethoscope"></i> Symptom Check</a></li>
+        <li><a href="#"><i class="fa-solid fa-map-location-dot"></i> Emergency Map</a></li>
+        <li><a href="#"><i class="fa-solid fa-tower-broadcast"></i> SOS Alerts</a></li>
+        <li><a href="#"><i class="fa-solid fa-clock-rotate-left"></i> History</a></li>
+        <li><a href="#"><i class="fa-solid fa-user"></i> Profile</a></li>
+        <li><a href="#"><i class="fa-solid fa-gear"></i> Settings</a></li>
+      </ul>
+    </nav>
+  </aside>
 
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Header -->
+    <header>
+
+      <!-- Search -->
+      <div class="search-bar">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Search...">
+      </div>
+
+      <!-- Header Actions -->
+      <div class="header-actions">
+
+        <div class="icon-btn"><i class="fa-solid fa-bell"></i></div>
+        <div class="icon-btn"><i class="fa-regular fa-bell"></i></div>
+
+        <!-- User Menu -->
+        <div class="user-menu">
+          <div class="user-trigger" id="userTrigger">
+            <span id="userInitials" class="initials">U</span>
+            <span id="userEmail" class="user-email"></span>
+          </div>
+
+          <div class="user-dropdown" id="userDropdown">
+            <button id="logoutBtn">Logout</button>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Dashboard Grid -->
+    <div class="dashboard-grid">
+
+      <!-- Column 1 -->
+      <div class="grid-col col-1">
+
+        <div class="card symptom-card">
+          <h3>Symptom Checker</h3>
+          <div class="symptom-input">
+            <i class="fa-solid fa-microphone"></i>
+            <input type="text" placeholder="Chest pain, shortness of breath">
+          </div>
+        </div>
+
+        <div class="card severity-card">
+          <h3>Emergency Severity</h3>
+          <div class="gauge-container">
+            <div class="gauge">
+              <i class="fa-solid fa-heart-pulse"></i>
+              <span class="status">HIGH</span>
+            </div>
+            <i class="fa-solid fa-triangle-exclamation warning-icon"></i>
+          </div>
+        </div>
+
+        <div class="card ai-card">
+          <h3>AI Recommendation</h3>
+          <ul>
+            <li>1. Call now</li>
+            <li>2. Share Location</li>
+            <li>• Stay Calm & Immobilize</li>
+          </ul>
+        </div>
+
+        <div class="card quick-action-card">
+          <h3>Quick Action</h3>
+          <button class="action-btn">Call Ambulance</button>
+          <button class="action-btn">Share Location</button>
+          <button class="action-btn primary">Contact Emergency</button>
+        </div>
+
+      </div>
+
+      <!-- Column 2 -->
+      <div class="grid-col col-2">
+
+        <div class="card map-card">
+          <div class="map-header">
+            <h3>Interactive Hospital Locator Map</h3>
+          </div>
+          <div class="map-visual">
+            <div class="map-point p1"><i class="fa-solid fa-plus"></i></div>
+            <div class="map-point p2"><i class="fa-solid fa-plus"></i></div>
+            <div class="map-point p3"><i class="fa-solid fa-plus"></i></div>
+            <div class="map-point p4"><i class="fa-solid fa-plus"></i></div>
+
+            <div class="map-point active-hospital">
+              <i class="fa-solid fa-square-plus"></i>
+              <div class="hospital-tooltip">
+                <strong>St. Mary Hospital</strong>
+                <span>2.5 miles</span>
+                <div class="hospital-details">
+                  <span>Emergency Room</span>
+                  <span>ETA: 7 mins</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card filter-sos-card">
+          <div class="filters">
+            <div class="filter-group">
+              <label>Filters</label>
+              <div class="tags">
+                <span class="tag"><span class="dot teal"></span> Emergency Room</span>
+                <span class="tag"><span class="dot green"></span> Cardiology</span>
+              </div>
+            </div>
+            <div class="filter-group">
+              <label>Filters</label>
+              <div class="tags">
+                <span class="tag"><span class="dot gray"></span> Endocrinology</span>
+                <span class="tag"><span class="dot gray"></span> Pediatrics</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sos-wrapper">
+            <button class="sos-btn">
+              SOS
+              <span>Emergency</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Column 3 -->
+      <div class="grid-col col-3">
+
+        <div class="card activity-card">
+          <h3>Recent Activity / Medical History</h3>
+          <div class="activity-item">
+            <div class="date">Jan 30 2026 <span class="active-status">Vitals</span></div>
+            <p>Chest discomfort evaluation</p>
+          </div>
+          <div class="activity-item">
+            <div class="date">July 9 2023 <span class="active-status">Vitals</span></div>
+            <p>Allergies</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
 </div>
 
-<button class="sos" onclick="sos()">SOS</button>
-
-<script>
-const SUPABASE_URL = "https://nybykqfzuqqzrcdnouim.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55YnlrcWZ6dXFxenJjZG5vdWltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4NzkxODcsImV4cCI6MjA4NTQ1NTE4N30.rIc_nu22Ajqunf4FqV-MVVOmvABHsSBXEW4Sun8bYNI";
-
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
-
-async function checkAuth() {
-  const { data: { session } } =
-    await supabaseClient.auth.getSession();
-
-  if (!session) {
-    window.location.href = "signin.html";
-    return;
-  }
-
-  document.getElementById("userInfo").innerText =
-    "Logged in as: " + session.user.email;
-}
-
-async function logout() {
-  await supabaseClient.auth.signOut();
-  window.location.href = "signin.html";
-}
-
-checkAuth();
-
-function analyze() {
-  const text = document.getElementById("symptoms").value.toLowerCase();
-  const result = document.getElementById("result");
-
-  if (!text) return result.innerHTML = "";
-
-  let msg = "Low Risk – Self care recommended";
-  let cls = "low";
-
-  if (text.includes("chest") || text.includes("breathing") || text.includes("unconscious")) {
-    msg = "High Risk – Seek emergency help immediately";
-    cls = "high";
-  } else if (text.includes("fever") || text.includes("vomiting")) {
-    msg = "Medium Risk – Monitor closely";
-    cls = "medium";
-  }
-
-  result.className = "result " + cls;
-  result.innerText = msg;
-}
-
-function sos() {
-  alert("🚨 SOS Alert Sent!\nLocation shared with emergency contacts.");
-}
-</script>
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
 
 </body>
 </html>

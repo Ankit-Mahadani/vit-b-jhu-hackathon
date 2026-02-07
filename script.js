@@ -15,12 +15,10 @@ const supabaseClient = window.supabase.createClient(
 // ===============================
 async function protectPage() {
   const { data: { user } } = await supabaseClient.auth.getUser();
-
   if (!user) {
     window.location.href = "signin.html";
     return;
   }
-
   showUser(user);
 }
 
@@ -33,7 +31,6 @@ function showUser(user) {
 
   const email = user.email;
   const name = user.user_metadata?.name;
-
   emailEl.textContent = email;
 
   const source = name || email;
@@ -55,6 +52,59 @@ async function logout() {
 }
 
 // ===============================
+// Location Helper
+// ===============================
+function getUserLocation() {
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        resolve({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude
+        });
+      },
+      reject
+    );
+  });
+}
+
+// ===============================
+// Symptom Checker (PHASE 1 MOCK)
+// ===============================
+async function runSymptomCheck(symptoms) {
+  if (!symptoms.trim()) return;
+
+  // 🔒 Phase-1 mock response (NO backend)
+  const data = {
+    severity: "HIGH",
+    recommendations: [
+      "Call emergency services immediately",
+      "Share your live location",
+      "Remain calm and avoid sudden movement"
+    ]
+  };
+
+  // Update severity UI
+  const statusEl = document.querySelector(".gauge .status");
+  statusEl.textContent = data.severity;
+
+  statusEl.style.color =
+    data.severity === "HIGH" ? "#E53E3E" :
+    data.severity === "MEDIUM" ? "#D69E2E" :
+    "#38A169";
+
+  // Update AI recommendations
+  const list = document.querySelector(".ai-card ul");
+  list.innerHTML = "";
+
+  data.recommendations.forEach((rec, i) => {
+    const li = document.createElement("li");
+    li.textContent = `${i + 1}. ${rec}`;
+    list.appendChild(li);
+  });
+}
+
+// ===============================
 // Init
 // ===============================
 document.addEventListener("DOMContentLoaded", () => {
@@ -64,19 +114,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const trigger = document.getElementById("userTrigger");
   const dropdown = document.getElementById("userDropdown");
 
-  // Logout click
+  // Logout
   if (logoutBtn) {
     logoutBtn.addEventListener("click", logout);
   }
 
-  // 🔽 TOGGLE DROPDOWN (THIS WAS MISSING)
+  // Dropdown toggle
   if (trigger && dropdown) {
     trigger.addEventListener("click", () => {
       dropdown.classList.toggle("show");
     });
   }
 
-  // ❌ Close dropdown when clicking outside
+  // Close dropdown on outside click
   document.addEventListener("click", (e) => {
     if (
       dropdown &&
@@ -86,4 +136,27 @@ document.addEventListener("DOMContentLoaded", () => {
       dropdown.classList.remove("show");
     }
   });
-});
+
+  // Symptom input
+  const symptomInput = document.querySelector(".symptom-input input");
+  if (symptomInput) {
+    symptomInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        runSymptomCheck(e.target.value);
+      }
+    });
+  }
+
+  // SOS button
+  const sosBtn = document.querySelector(".sos-btn");
+  if (sosBtn) {
+    sosBtn.addEventListener("click", async () => {
+      try {
+        await getUserLocation();
+        alert("SOS sent. Location shared successfully.");
+      } catch {
+        alert("Location permission is required for SOS.");
+      }
+    });
+  }
+}); 

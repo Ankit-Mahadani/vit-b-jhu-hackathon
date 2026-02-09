@@ -258,13 +258,17 @@ async function initMap() {
 
 async function fetchNearbyHospitals(loc) {
   try {
-    // Overpass API Query for hospitals within 5km
+    console.log("Searching for hospitals near:", loc);
+
+    // Overpass API Query for hospitals and clinics within 10km
     const query = `
-      [out:json];
+      [out:json][timeout:25];
       (
-        node["amenity"="hospital"](around:5000, ${loc.lat}, ${loc.lng});
-        way["amenity"="hospital"](around:5000, ${loc.lat}, ${loc.lng});
-        relation["amenity"="hospital"](around:5000, ${loc.lat}, ${loc.lng});
+        node["amenity"="hospital"](around:10000, ${loc.lat}, ${loc.lng});
+        way["amenity"="hospital"](around:10000, ${loc.lat}, ${loc.lng});
+        relation["amenity"="hospital"](around:10000, ${loc.lat}, ${loc.lng});
+        node["healthcare"="hospital"](around:10000, ${loc.lat}, ${loc.lng});
+        node["amenity"="clinic"](around:10000, ${loc.lat}, ${loc.lng});
       );
       out center;
     `;
@@ -277,7 +281,8 @@ async function fetchNearbyHospitals(loc) {
     if (data.elements && data.elements.length > 0) {
       updateMapMarkers(data.elements, loc);
     } else {
-      console.warn("No hospitals found nearby via OpenStreetMap.");
+      console.warn("No hospitals found nearby via OpenStreetMap within 10km.");
+      // Optional: try one even larger radius or show "No results"
     }
   } catch (error) {
     console.error("Hospital Fetch Error:", error);
@@ -299,8 +304,16 @@ function updateMapMarkers(elements, userLoc) {
       // Calculate distance (very rough estimate for display)
       const dist = calculateDistance(userLoc.lat, userLoc.lng, lat, lon);
 
-      L.marker([lat, lon]).addTo(markersLayer)
-        .bindPopup(`<b>${name}</b><br>${address}<br>Distance: ${dist.toFixed(1)} km`);
+      const marker = L.circleMarker([lat, lon], {
+        radius: 8,
+        fillColor: "#E53E3E",
+        color: "#fff",
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.8
+      }).addTo(markersLayer);
+
+      marker.bindPopup(`<b>${name}</b><br>${address}<br>Distance: ${dist.toFixed(1)} km`);
 
       // Also update dashboard UI if needed - but Leaflet usually handles its own interactivity.
     }

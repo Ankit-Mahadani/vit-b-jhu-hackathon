@@ -264,7 +264,7 @@ async function fetchNearbyHospitals(loc) {
     "https://lz4.overpass-api.de/api/interpreter"
   ];
   const radii = [5000, 15000, 30000, 50000]; // 5km, 15km, 30km, 50km
-  let found = false;
+  let foundElements = [];
 
   try {
     for (const radius of radii) {
@@ -295,31 +295,27 @@ async function fetchNearbyHospitals(loc) {
 
           const data = await response.json();
           if (data.elements && data.elements.length > 0) {
-            updateMapMarkers(data.elements, loc);
+            foundElements = data.elements;
 
-            // Adjust map zoom based on the successful radius
-            const zoom = radius <= 5000 ? 13 : radius <= 15000 ? 11 : radius <= 30000 ? 10 : 9;
-            if (mapInstance) {
-              mapInstance.setView([loc.lat, loc.lng], zoom);
-            }
-
-            found = true;
-            break; // Exit mirrors loop
-          } else {
-            // No elements at this radius, but server responded. Try next radius.
-            break; // Exit mirrors loop to try next radius
+            // If we have at least 3, we stop. Otherwise continue to next radius.
+            if (foundElements.length >= 3) break;
           }
+
+          // If mirror responded (even with 0 results), we move to next radius
+          break;
         } catch (mirrorErr) {
           console.error(`Mirror ${mirror} Error:`, mirrorErr);
           continue; // Try next mirror
         }
       }
 
-      if (found) break; // Exit radii loop
-      console.warn(`No hospitals found within ${radius / 1000}km, expanding...`);
+      if (foundElements.length >= 3) break;
+      console.warn(`Found only ${foundElements.length} hospitals within ${radius / 1000}km, expanding...`);
     }
 
-    if (!found) {
+    if (foundElements.length > 0) {
+      updateMapMarkers(foundElements, loc);
+    } else {
       console.error("No hospitals found even after maximum expansion and mirror retries.");
     }
   } catch (error) {
@@ -347,6 +343,9 @@ function updateMapMarkers(elements, userLoc) {
   markersData.sort((a, b) => a.dist - b.dist);
 
   const group = L.featureGroup();
+
+  // Add user location marker (dummy) to group to ensure it's in bounds
+  group.addLayer(L.marker([userLoc.lat, userLoc.lng]));
 
   // Categories for the top 3
   const categories = [

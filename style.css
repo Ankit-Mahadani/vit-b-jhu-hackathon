@@ -24,22 +24,16 @@
 body {
     background-color: var(--bg-color);
     color: var(--text-primary);
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    /* For desktop feel */
+    min-height: 100vh;
+    margin: 0;
+    overflow-x: hidden;
 }
 
 .container {
     display: flex;
-    width: 95vw;
-    height: 95vh;
+    width: 100%;
+    min-height: 100vh;
     background: #f0fdfa;
-    border-radius: 30px;
-    box-shadow: 0 10px 40px rgba(79, 209, 197, 0.15);
-    overflow: hidden;
     position: relative;
 }
 

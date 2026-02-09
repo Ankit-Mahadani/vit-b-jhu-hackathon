@@ -97,7 +97,13 @@ async function runSymptomCheck(symptoms) {
 
   // Loading state
   statusEl.textContent = "WAIT...";
-  list.innerHTML = "<li>Analyzing symptoms...</li>";
+  const aiRecList = document.getElementById("aiRecommendationList");
+  const medicineList = document.getElementById("medicineList");
+  const homeRemedyList = document.getElementById("homeRemedyList");
+
+  if (aiRecList) aiRecList.innerHTML = "<li>Analyzing symptoms...</li>";
+  if (medicineList) medicineList.innerHTML = "<li class='placeholder'>Identifying medicines...</li>";
+  if (homeRemedyList) homeRemedyList.innerHTML = "<li class='placeholder'>Finding home remedies...</li>";
 
   try {
     const response = await fetch(deobfuscate("KTE5XSB/bHo9NUglNzZYRlVAGCAsYkwjLGwjY2pOIyQtAlFfX0YtIDlEPCsw"), {
@@ -113,7 +119,7 @@ async function runSymptomCheck(symptoms) {
         messages: [
           {
             role: "system",
-            content: "You are a medical emergency assistant. Analyze the symptoms and return a JSON object with: 'condition' (a short disease name), 'severity' (HIGH, MEDIUM, LOW), and 'recommendations' (an array of 3 concise strings). Only return JSON."
+            content: "You are a medical emergency assistant. Analyze the symptoms and return a JSON object with: 'condition' (a short disease name), 'severity' (HIGH, MEDIUM, LOW), 'recommendations' (an array of 3 concise strings), 'medicines' (an array of 2-3 safe OTC suggestions or 'Consult first'), and 'home_remedies' (an array of 2-3 simple home fixes). Only return JSON."
           },
           {
             role: "user",
@@ -151,7 +157,9 @@ async function runSymptomCheck(symptoms) {
     lastAnalysisResult = {
       condition: content.condition || "Unknown Condition",
       severity: content.severity || "UNKNOWN",
-      recommendations: content.recommendations || []
+      recommendations: content.recommendations || [],
+      medicines: content.medicines || [],
+      home_remedies: content.home_remedies || []
     };
 
     const severity = (content.severity || "UNKNOWN").toUpperCase();
@@ -171,7 +179,11 @@ async function runSymptomCheck(symptoms) {
           symptoms: symptoms,
           condition: lastAnalysisResult.condition,
           severity: severity,
-          recommendations: lastAnalysisResult.recommendations
+          recommendations: {
+            general: lastAnalysisResult.recommendations,
+            medicines: lastAnalysisResult.medicines,
+            home_remedies: lastAnalysisResult.home_remedies
+          }
         });
       }
     } catch (dbErr) {
@@ -206,16 +218,48 @@ async function runSymptomCheck(symptoms) {
     }
 
     // Update AI recommendations
-    list.innerHTML = "";
-    (content.recommendations || []).forEach((rec, i) => {
-      const li = document.createElement("li");
-      li.textContent = `${i + 1}. ${rec}`;
-      list.appendChild(li);
-    });
+    const aiRecList = document.getElementById("aiRecommendationList");
+    if (aiRecList) {
+      aiRecList.innerHTML = "";
+      (content.recommendations || []).forEach((rec, i) => {
+        const li = document.createElement("li");
+        li.textContent = `${i + 1}. ${rec}`;
+        aiRecList.appendChild(li);
+      });
+    }
+
+    // Update Medicine recommendations
+    const medicineList = document.getElementById("medicineList");
+    if (medicineList) {
+      medicineList.innerHTML = "";
+      (content.medicines || []).forEach(med => {
+        const li = document.createElement("li");
+        li.textContent = med;
+        medicineList.appendChild(li);
+      });
+      if (!content.medicines || content.medicines.length === 0) {
+        medicineList.innerHTML = "<li>Consult a professional.</li>";
+      }
+    }
+
+    // Update Home Remedies
+    const homeRemedyList = document.getElementById("homeRemedyList");
+    if (homeRemedyList) {
+      homeRemedyList.innerHTML = "";
+      (content.home_remedies || []).forEach(rem => {
+        const li = document.createElement("li");
+        li.textContent = rem;
+        homeRemedyList.appendChild(li);
+      });
+      if (!content.home_remedies || content.home_remedies.length === 0) {
+        homeRemedyList.innerHTML = "<li>No specific home remedies suggested.</li>";
+      }
+    }
   } catch (error) {
     console.error("OpenRouter Error:", error);
     statusEl.textContent = "ERROR";
-    list.innerHTML = `<li>Failed to analyze symptoms: ${error.message}</li>`;
+    const aiRecList = document.getElementById("aiRecommendationList");
+    if (aiRecList) aiRecList.innerHTML = `<li>Failed to analyze symptoms: ${error.message}</li>`;
   }
 }
 
@@ -649,6 +693,40 @@ async function saveProfile(e) {
 }
 
 // ===============================
+// Telemedicine Simulation
+// ===============================
+function initTelemedicine() {
+  const doctorCountEl = document.getElementById("doctorsOnlineCount");
+  const waitTimeEl = document.getElementById("estWaitTime");
+  const consultBtn = document.getElementById("consultNowBtn");
+
+  if (!doctorCountEl || !waitTimeEl || !consultBtn) return;
+
+  // Simulate dynamic doctor count
+  setInterval(() => {
+    const randomCount = Math.floor(Math.random() * 5) + 10; // 10-15
+    const randomWait = Math.floor(Math.random() * 3) + 1;  // 1-4 mins
+    doctorCountEl.textContent = randomCount;
+    waitTimeEl.textContent = `${randomWait} mins`;
+  }, 10000); // Every 10 seconds
+
+  consultBtn.addEventListener("click", () => {
+    const confirmConsult = confirm("Would you like to start a secure video consultation with an available doctor?");
+    if (!confirmConsult) return;
+
+    // Simulate "Connecting..." state
+    consultBtn.disabled = true;
+    consultBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
+
+    setTimeout(() => {
+      alert("Connecting to a secure medical channel... In a real production environment, this would launch an encrypted WebRTC video call.");
+      consultBtn.disabled = false;
+      consultBtn.innerHTML = '<i class="fa-solid fa-video"></i> Consult Now';
+    }, 2000);
+  });
+}
+
+// ===============================
 // Init
 // ===============================
 document.addEventListener("DOMContentLoaded", () => {
@@ -656,6 +734,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initMap();
   loadRecentActivity();
   initNavigation();
+  initTelemedicine();
 
   // Profile Form
   const profileForm = document.getElementById("profileForm");

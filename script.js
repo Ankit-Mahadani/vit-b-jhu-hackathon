@@ -106,7 +106,7 @@ async function runSymptomCheck(symptoms) {
         "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
         "HTTP-Referer": window.location.origin,
-        "X-Title": "AEM Emergency Dashboard"
+        "X-Title": "LifeLine Emergency Dashboard"
       },
       body: JSON.stringify({
         model: "openai/gpt-3.5-turbo",

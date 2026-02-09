@@ -738,4 +738,33 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  // Call Ambulance Button
+  const callAmbulanceBtn = document.getElementById("callAmbulanceBtn");
+  if (callAmbulanceBtn) {
+    callAmbulanceBtn.addEventListener("click", async () => {
+      const confirmCall = confirm("Are you sure you want to call an ambulance?");
+      if (!confirmCall) return;
+
+      try {
+        // Trigger Call
+        window.location.href = "tel:102";
+
+        // Log to Supabase
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (user) {
+          await supabaseClient.from('emergency_logs').insert({
+            user_id: user.id,
+            type: 'ambulance_call',
+            condition: lastAnalysisResult?.condition || "Emergency Situation",
+            severity: lastAnalysisResult?.severity || "HIGH",
+            timestamp: new Date().toISOString()
+          });
+          loadRecentActivity();
+        }
+      } catch (error) {
+        console.error("Ambulance Call Error:", error);
+      }
+    });
+  }
 }); 

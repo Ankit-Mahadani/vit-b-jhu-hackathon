@@ -354,6 +354,9 @@ function updateMapMarkers(elements, userLoc) {
     { label: "FAMOUS / WELL-KNOWN", color: "#38A169" }  // Green
   ];
 
+  const hospitalList = document.getElementById("hospitalList");
+  if (hospitalList) hospitalList.innerHTML = "";
+
   markersData.slice(0, 10).forEach((m, i) => {
     const category = i < categories.length ? categories[i] : null;
     const name = m.tags.name || "Hospital";
@@ -379,6 +382,32 @@ function updateMapMarkers(elements, userLoc) {
 
     marker.bindPopup(popupContent);
     group.addLayer(marker);
+
+    // Populate directory list
+    if (hospitalList) {
+      const phone = m.tags.phone || m.tags["contact:phone"] || "N/A";
+      const item = document.createElement("div");
+      item.className = "hospital-item";
+      item.onclick = () => {
+        if (phone !== "N/A") {
+          window.location.href = `tel:${phone.replace(/\s+/g, '')}`;
+        } else {
+          alert("Phone number not available for this facility.");
+        }
+      };
+
+      item.innerHTML = `
+        <div class="hospital-info">
+          <span class="hospital-name">${name}</span>
+          <span class="hospital-addr">${address}</span>
+          ${phone !== 'N/A' ? `<span class="hospital-phone"><i class="fa-solid fa-phone"></i> ${phone}</span>` : ''}
+        </div>
+        <div class="call-icon">
+          <i class="fa-solid fa-phone"></i>
+        </div>
+      `;
+      hospitalList.appendChild(item);
+    }
 
     // Auto-open nearest
     if (i === 0) {

@@ -599,6 +599,88 @@ header {
     margin-top: 0.2rem;
 }
 
+/* Hospital Directory Card */
+.directory-card {
+    max-height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.hospital-list {
+    overflow-y: auto;
+    flex: 1;
+    margin-top: 0.5rem;
+    padding-right: 5px;
+}
+
+.hospital-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.hospital-list::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 10px;
+}
+
+.hospital-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    transition: 0.2s;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.hospital-item:hover {
+    background: #ebf8ff;
+    border-color: #bee3f8;
+    transform: translateX(5px);
+}
+
+.hospital-info {
+    flex: 1;
+}
+
+.hospital-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: block;
+}
+
+.hospital-addr {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    display: block;
+}
+
+.hospital-phone {
+    font-size: 0.8rem;
+    color: var(--primary-dark);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 3px;
+}
+
+.call-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    box-shadow: 0 2px 5px rgba(79, 209, 197, 0.3);
+}
+
 /* Heart Rate */
 .heart-stats {
     display: flex;

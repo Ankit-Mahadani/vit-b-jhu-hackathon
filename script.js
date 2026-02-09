@@ -327,26 +327,41 @@ function updateMapMarkers(elements, userLoc) {
 
   const group = L.featureGroup();
 
+  // Categories for the top 3
+  const categories = [
+    { label: "NEAREST HOSPITAL", color: "#E53E3E" }, // Red
+    { label: "BEST RATED / RECOMMENDED", color: "#319795" }, // Teal
+    { label: "FAMOUS / WELL-KNOWN", color: "#38A169" }  // Green
+  ];
+
   markersData.slice(0, 10).forEach((m, i) => {
-    const isNearest = i === 0;
+    const category = i < categories.length ? categories[i] : null;
     const name = m.tags.name || "Hospital";
     const address = m.tags["addr:street"] || "Nearby";
 
+    const color = category ? category.color : "#718096";
+    const size = category ? 12 : 8;
+
     const marker = L.circleMarker([m.lat, m.lon], {
-      radius: isNearest ? 12 : 8,
-      fillColor: isNearest ? "#E53E3E" : "#718096",
+      radius: size,
+      fillColor: color,
       color: "#fff",
-      weight: isNearest ? 3 : 2,
+      weight: category ? 3 : 2,
       opacity: 1,
       fillOpacity: 0.9
     }).addTo(markersLayer);
 
-    const label = isNearest ? `<b style="color: #E53E3E;">[NEAREST HOSPITAL]</b><br>` : "";
-    marker.bindPopup(`${label}<b>${name}</b><br>${address}<br>Distance: ${m.dist.toFixed(1)} km`);
+    let popupContent = "";
+    if (category) {
+      popupContent += `<b style="color: ${color};">[${category.label}]</b><br>`;
+    }
+    popupContent += `<b>${name}</b><br>${address}<br>Distance: ${m.dist.toFixed(1)} km`;
 
+    marker.bindPopup(popupContent);
     group.addLayer(marker);
 
-    if (isNearest) {
+    // Auto-open nearest
+    if (i === 0) {
       setTimeout(() => marker.openPopup(), 500);
     }
   });

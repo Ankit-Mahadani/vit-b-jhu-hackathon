@@ -82,7 +82,7 @@ const TRANSLATIONS = {
     "label-heartbeat": "Heart Beat",
     "label-oxygen": "Oxygen (SpO2)",
     "label-stress": "Stress Level",
-    "watch-title": "Boult Connect",
+    "watch-title": "Watch Connect",
     "watch-subtitle": "Premium Web Bluetooth Heart Rate Monitor",
     "btn-connect": "Connect Watch",
     "label-hr": "Heart Rate",
@@ -1424,7 +1424,7 @@ function populateDoctors(preferredSpecialty = null) {
 }
 
 // ===============================
-// Boult Connect (Web Bluetooth)
+// Watch Connect (Web Bluetooth)
 // ===============================
 let bluetoothDevice = null;
 let heartRateChar = null;
